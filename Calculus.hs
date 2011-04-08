@@ -6,10 +6,6 @@ module Calculus ( integrate,
 δx :: Double
 δx = 0.00001
 
--- a slightly larger delta, for when we need it ;)
-dx :: Double
-dx = 0.01
-
 -- Integrates a function `f' from a to b
 integrate :: Double -> (Double -> Double) -> Double -> Double
 integrate a f b = fix_sign * (sum $ map f x_vals) * δx
@@ -28,25 +24,31 @@ derivative f x = (f(x + δx) - f(x)) / δx
 arclength :: Double -> (Double -> Double) -> (Double -> Double)
 arclength a f = integrate a (\x -> sqrt $ (derivative f x)**2 + 1)
 
--- No need to have a termination condition, the list MUST be infinite.
--- Approximates a value of a strictly increasing, continuous function,
--- where the inputs and outputs to the function are in the infinite list.
--- When the outputs get to `target_val', it returns the matching x-value.
-approximate :: [(Double, Double)] -> Double -> Double
-approximate [] _       = error "approximate needs to be passed an infinite list to work."
-approximate [(_, _)] _ = approximate [] 1.0
-approximate ((x1, y1):(x2, y2):xs) target_val =
-    if y1 < target_val && target_val < y2 then
-        (x1 + x2) / 2 -- y1 < target_val < y2, therefore, average them.
-    else
-        approximate ((x2, y2):xs) target_val
-
--- Returns a value of 'b' such that arclength a b f ~ el
--- Note: This is insanely slow. Should I be better-defining the search space and
--- binary searching?
-arclength_inv :: Double -> (Double -> Double) -> Double -> Double
-arclength_inv a f el = approximate candidates el
+close :: Double -> Double -> Double -> Bool
+close x y delta = (low + delta) > high
     where
-        inputs     = [a, (a + dx) ..]
-        outputs    = map (arclength a f) inputs
-        candidates = zip inputs outputs
+        low  = min x y
+        high = max x y
+
+-- Returns the initial domain of the function.
+find_domain :: Double -> Double -> (Double -> Double) -> Double -> (Double, Double)
+find_domain start last f target | target < (f last) = (start, last)
+                                | otherwise         = find_domain last (last + 2*(last - start))  f target
+--                                                                    ^ Doubles the search space ^
+
+-- Does a binary search on the interval [low, high] for a value 'x' such that
+-- f(x) = target +/- 10δ
+bsearch :: Double -> Double -> Double -> (Double -> Double) -> Double
+bsearch low high target f | close y target (10*δx) = mid
+                          | y < target            = bsearch mid high target f
+                          | otherwise             = bsearch low mid  target f
+    where
+        mid = (low + high) / 2
+        y   = f mid
+
+-- Returns the x value such that the arclength of f from a to x will be equal to t.
+arclength_inv :: Double -> (Double -> Double) -> Double -> Double
+arclength_inv a f t = bsearch x y t func
+    where
+        (x, y) = find_domain a (a + 1) func t
+        func   = arclength a f
