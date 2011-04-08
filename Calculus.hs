@@ -32,9 +32,10 @@ close x y delta = (low + delta) > high
 
 -- Returns the initial domain of the function.
 find_domain :: Double -> Double -> (Double -> Double) -> Double -> (Double, Double)
-find_domain start last f target | target < (f last) = (start, last)
-                                | otherwise         = find_domain last (last + 2*(last - start))  f target
---                                                                    ^ Doubles the search space ^
+find_domain start last f target | close target (f last) (10*δx) = (last, last) -- If we found it (fluke).
+                                | target < (f last)             = (start, last)
+                                | otherwise                     = find_domain last (last + 2*(last - start))  f target
+--                                                                                ^ Doubles the search space ^
 
 -- Does a binary search on the interval [low, high] for a value 'x' such that
 -- f(x) = target +/- 10δ
