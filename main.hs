@@ -2,6 +2,8 @@ module Main where
 
 import Calculus
 
+import Control.Parallel
+import Control.Parallel.Strategies
 import Graphics.Gnuplot.Simple
 
 -- The minimum radius of the cone:
@@ -39,11 +41,15 @@ _2points r = [point r, (neg2nd $ point r)]
         -- The point on the circle of radius r.
         point r = (r * (cos . theta)(r), r * (sin . theta)(r))
 
+pmap :: (a -> b) -> [a] -> [b]
+--pmap f xs = parMap rdeepseq f xs
+pmap = map
+
 -- Our sample points.
 distances :: [Double]
 distances = [α, (α + 0.1) .. β]
 
 makepoints :: [(Double, Double)]
-makepoints = foldr1 (++) $ map _2points distances
+makepoints = foldr1 (++) $ pmap _2points distances
 
 main = plotDots [XRange (α, β), YRange (-β, β)] makepoints

@@ -8,7 +8,7 @@ module Calculus ( integrate,
 
 -- Integrates a function `f' from a to b
 integrate :: Double -> (Double -> Double) -> Double -> Double
-integrate a f b = fix_sign * (sum $ map f x_vals) * δx
+integrate a f b = fix_sign * (sum $ map (\x -> δx * f x) x_vals)
     where
         (a', b') = (min a b, max a b)
         fix_sign | a <= b    =  1
