@@ -25,7 +25,7 @@ g x = α + (f α) - (f x)
 
 -- Two cutouts, therefore, we halve the actual length.
 cutout_length :: Double -> Double
-cutout_length r = (pi/2) * (r - r_cone)
+cutout_length r = pi * (r - r_cone)
     where
         r_cone = arclength_inv α g (r - α)
 
