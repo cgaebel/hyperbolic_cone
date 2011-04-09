@@ -25,7 +25,7 @@ g x = α + (f α) - (f x)
 cutout_length :: Double -> Double
 cutout_length r = (2*pi*r - r_cone) / 2
     where
-        r_cone = arclength_inv α g r
+        r_cone = arclength_inv α g (r - α)
 
 -- the angle of a cutout, measured from the x-axis.
 theta :: Double -> Double
@@ -41,7 +41,7 @@ _2points r = [point r, (neg2nd $ point r)]
 
 -- Our sample points.
 distances :: [Double]
-distances = [α, (α + 0.01) .. β]
+distances = [α, (α + 0.1) .. β]
 
 makepoints :: [(Double, Double)]
 makepoints = foldr1 (++) $ map _2points distances
