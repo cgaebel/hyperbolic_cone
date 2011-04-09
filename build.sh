@@ -1,3 +1,5 @@
 #!/bin/bash
 
-ghc -rtsopts -threaded --make -O10 -msse2 main.hs
+OPTIMIZATIONS="-O10 -msse2 -fdo-lambda-eta-expansion -fexcess-precision -fignore-asserts -fmax-simplifier-iterations=100000"
+
+ghc --make $OPTIMIZATIONS main.hs

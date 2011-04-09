@@ -2,7 +2,6 @@ module Main where
 
 import Calculus
 
-import Control.Parallel.Strategies
 import Graphics.Gnuplot.Simple
 
 -- The minimum radius of the cone:
@@ -45,6 +44,6 @@ distances :: [Double]
 distances = [α, (α + 0.01) .. β]
 
 makepoints :: [(Double, Double)]
-makepoints = foldr1 (++) $ (parMap rpar) _2points distances
+makepoints = foldr1 (++) $ map _2points distances
 
 main = plotDots [XRange (α, β), YRange (-β, β)] makepoints
