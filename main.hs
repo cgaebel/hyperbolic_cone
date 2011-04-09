@@ -25,7 +25,7 @@ g x = α + (f α) - (f x)
 
 -- Two cutouts, therefore, we halve the actual length.
 cutout_length :: Double -> Double
-cutout_length r = (2*pi*r - r_cone) / 2
+cutout_length r = (pi/2) * (r - r_cone)
     where
         r_cone = arclength_inv α g (r - α)
 
@@ -50,6 +50,6 @@ distances :: [Double]
 distances = [α, (α + 0.1) .. β]
 
 makepoints :: [(Double, Double)]
-makepoints = foldr1 (++) $ pmap _2points distances
+makepoints = foldr1 (++) $ parMap rdeepseq _2points distances
 
 main = plotDots [XRange (α, β), YRange (-β, β)] makepoints
