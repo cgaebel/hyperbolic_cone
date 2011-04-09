@@ -1,50 +1,50 @@
 module Main where
 
-import Graphics.Gnuplot.Simple
 import Calculus
 
+import Control.Parallel.Strategies
+import Graphics.Gnuplot.Simple
+
 -- The minimum radius of the cone:
-α = 1 :: Double
+α :: Double
+α = 1
 
 -- The maximum radius of the cone:
-β = 10 :: Double
+β :: Double
+β = 10
 
 -- Our original function. Given a radius of the cone, returns the distance from
 -- the asymptote.
---f  = (** (-2))
-f x = x
-
--- The inverse of f.
---f' = (** (-1/2))
-f' x = x
+f :: (Double -> Double)
+f = (** (-2))
 
 -- The new, translated function.
-g  x = α + (f α) - (f x)
+g :: Double -> Double
+g x = α + (f α) - (f x)
 
--- The inverse of g.
-g' x = f' $ α + (f α) - x
-
--- Now, the radius of the cone at distance 'x' from the center of the net is
--- equal to g'(x). Therefore, the circumference is going to be equal to 2pi*g'(x).
--- The circumerference of the net's circle will be 2pi*x. Therefore, the
--- circumference of cutout will be 2pi(x - g'(x)), OR two cutouts side-by-side
--- of length pi(x-g'(x)).
-cutout_length r = pi * (r - (g' r))
+-- Two cutouts, therefore, we halve the actual length.
+cutout_length :: Double -> Double
+cutout_length r = (2*pi*r - r_cone) / 2
+    where
+        r_cone = arclength_inv α g r
 
 -- the angle of a cutout, measured from the x-axis.
+theta :: Double -> Double
 theta r = (cutout_length r) / r
 
 -- Gets the positive and negative points on a circle of radius r.
+_2points :: Double -> [(Double, Double)]
 _2points r = [point r, (neg2nd $ point r)]
-  where
-    neg2nd (x, y) = (x, -y)
-    -- The point on the circle of radius r.
-    point r = (r * (cos . theta)(r), r * (sin . theta)(r))
+    where
+        neg2nd (x, y) = (x, -y)
+        -- The point on the circle of radius r.
+        point r = (r * (cos . theta)(r), r * (sin . theta)(r))
 
 -- Our sample points.
-distances = [α, (α + 0.001) .. β]
+distances :: [Double]
+distances = [α, (α + 0.01) .. β]
 
-makepoints = foldr1 (++) $ map _2points distances
+makepoints :: [(Double, Double)]
+makepoints = foldr1 (++) $ (parMap rpar) _2points distances
 
---main = plotDots [XRange (α, β), YRange (-β, β)] makepoints
-main = print $ arclength_inv 1 (**(-2)) 9.30918
+main = plotDots [XRange (α, β), YRange (-β, β)] makepoints
