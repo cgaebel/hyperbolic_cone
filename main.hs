@@ -4,15 +4,16 @@ import Calculus
 
 import Control.Parallel
 import Control.Parallel.Strategies
+import Data.Ratio
 import Graphics.Gnuplot.Simple
 
 -- The minimum radius of the cone:
 α :: Double
-α = 1
+α = 4.5
 
 -- The maximum radius of the cone:
 β :: Double
-β = 10
+β = 12.0
 
 -- Our original function. Given a radius of the cone, returns the distance from
 -- the asymptote.
@@ -47,9 +48,9 @@ pmap = map
 
 -- Our sample points.
 distances :: [Double]
-distances = [α, (α + 0.1) .. β]
+distances = [α, (α + 0.001) .. β]
 
 makepoints :: [(Double, Double)]
 makepoints = foldr1 (++) $ parMap rdeepseq _2points distances
 
-main = plotDots [XRange (α, β), YRange (-β, β)] makepoints
+main = plotDots [XRange (-β, β), YRange (-β, β), PNG "out.png", Aspect (Ratio 1.0)] makepoints
