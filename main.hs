@@ -1,4 +1,4 @@
-module Main where
+module Main (main) where
 
 import Calculus
 
@@ -50,7 +50,14 @@ pmap = map
 distances :: [Double]
 distances = [α, (α + 0.001) .. β]
 
-makepoints :: [(Double, Double)]
-makepoints = foldr1 (++) $ parMap rdeepseq _2points distances
+points :: [(Double, Double)]
+points = pmap point distances
+    where
+        point r = (r * (cos . theta)(r), r * (sin . theta)(r))
 
-main = plotDots [XRange (-β, β), YRange (-β, β), PNG "out.png", Aspect (Ratio 1.0)] makepoints
+allpoints :: [(Double, Double)]
+allpoints = points ++ map neg2nd points
+    where
+        neg2nd (x, y) = (x, -y)
+
+main = plotDots [XRange (-β, β), YRange (-β, β), PNG "out.png", Aspect (Ratio 1.0)] allpoints
