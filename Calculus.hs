@@ -10,21 +10,20 @@ import Data.Ratio
 δx :: Double
 δx = 0.0001
 
--- Gets the nth row of triangle numbers
-triangle_gen :: Int -> [Integer]
-triangle_gen 0 = [1]
-triangle_gen n = map kth $ [0..n]
-    where
-        last = triangle_gen (n - 1)
-        kth 0 = 1
-        kth k | k == n    = 1
-              | otherwise =  x + y
-            where
-                (x:y:_) = drop (k - 1) last
-
 -- Gets the kth element of the nth triangle number row
 triangle :: Int -> Int -> Integer
 triangle n k = head $ drop k $ triangle_gen n
+    where
+        -- triangle_gen: gets the nth row of triangle numbers.
+        triangle_gen 0 = [1]
+        triangle_gen n = map kth [0..n]
+            where
+                last = triangle_gen (n-1)
+                kth 0 = 1
+                kth k | k == n    = 1
+                      | otherwise = x + y
+                    where
+                        (x:y:_) = drop (k - 1) last
 
 -- Integrates a function `f' from a to b
 integrate :: Double -> (Double -> Double) -> Double -> Double
@@ -41,12 +40,12 @@ derivative = nth_derivative 1
 
 -- Returns a function representing the nth derivative of f.
 nth_derivative :: Int -> (Double -> Double) -> Double -> Double
-nth_derivative n f x = fromRational $ toRational δx * (sum . map g) [0..n]
+nth_derivative n f x = fromRational $ sum $ map g [0..n]
     where
         g k = toRational(sign k * triangle n k) * (func k x) * delta
         sign k    = if (k `mod` 2) == 0 then 1 else -1
         func k x  = (toRational . f)(x + (fromIntegral $ n - k)*δx)
-        delta     = 1 / (toRational δx)^n
+        delta     = recip (toRational δx)^n
 
 -- Returns the arclength of f(x) between a and b. (where the last parameter `b'
 -- is curried).
