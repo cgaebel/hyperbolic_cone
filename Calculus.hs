@@ -8,7 +8,7 @@ module Calculus ( --integrate,
 import Data.Ratio
 
 δx :: Double
-δx = 0.00001
+δx = 0.0001
 
 -- Gets the nth row of triangle numbers
 triangle_gen :: Int -> [Integer]
@@ -41,11 +41,10 @@ derivative = nth_derivative 1
 
 -- Returns a function representing the nth derivative of f.
 nth_derivative :: Int -> (Double -> Double) -> Double -> Double
-nth_derivative n f x = fromRational $ sum $ map g [0..n]
+nth_derivative n f x = fromRational $ toRational δx * (sum . map g) [0..n]
     where
-        g k = toRational(sign k * triag n k) * (func k x) * delta
+        g k = toRational(sign k * triangle n k) * (func k x) * delta
         sign k    = if (k `mod` 2) == 0 then 1 else -1
-        triag n k = triangle n k
         func k x  = (toRational . f)(x + (fromIntegral $ n - k)*δx)
         delta     = 1 / (toRational δx)^n
 

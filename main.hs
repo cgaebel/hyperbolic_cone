@@ -57,4 +57,5 @@ allpoints = points ++ map neg2nd points
     where
         neg2nd (x, y) = (x, -y)
 
-main = plotDots [XRange (-β, β), YRange (-β, β), PNG "out.png", Aspect (Ratio 1.0)] allpoints
+main :: IO ()
+main = plotDots [XRange (-β, β), YRange (-β, β), Aspect (Ratio 1.0)] allpoints
