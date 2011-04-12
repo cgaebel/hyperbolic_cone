@@ -42,18 +42,15 @@ _2points r = [point r, (neg2nd $ point r)]
         -- The point on the circle of radius r.
         point r = (r * (cos . theta)(r), r * (sin . theta)(r))
 
-pmap :: (a -> b) -> [a] -> [b]
---pmap f xs = parMap rdeepseq f xs
-pmap = map
-
 -- Our sample points.
 distances :: [Double]
-distances = [α, (α + 0.001) .. β]
+distances = [α, (α + 0.1) .. β]
 
 points :: [(Double, Double)]
 points = pmap point distances
     where
         point r = (r * (cos . theta)(r), r * (sin . theta)(r))
+        pmap = parMap rdeepseq
 
 allpoints :: [(Double, Double)]
 allpoints = points ++ map neg2nd points
