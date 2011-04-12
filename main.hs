@@ -18,7 +18,7 @@ import Graphics.Gnuplot.Simple
 -- Our original function. Given a radius of the cone, returns the distance from
 -- the asymptote.
 f :: (Double -> Double)
-f = (** (-2))
+f = recip . (^ 2)
 
 -- The new, translated function.
 g :: Double -> Double
